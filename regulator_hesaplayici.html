@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Regülatör Hesaplayıcı</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #f5f4ee;
+    color: #2c2c2a;
+    padding: 16px;
+    line-height: 1.5;
+    min-height: 100vh;
+    -webkit-text-size-adjust: 100%;
+  }
+  .container { max-width: 520px; margin: 0 auto; }
+  h1 { font-size: 22px; font-weight: 600; margin-bottom: 6px; text-align: center; }
+  .subtitle { text-align: center; color: #5f5e5a; font-size: 14px; margin-bottom: 20px; }
+  .card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+    border: 1px solid #e5e3db;
+  }
+  .row { display: flex; align-items: center; gap: 10px; }
+  .icon { font-size: 24px; width: 36px; text-align: center; }
+  .info { flex: 1; min-width: 0; }
+  .name { font-size: 15px; font-weight: 600; color: #2c2c2a; }
+  .hint { font-size: 12px; color: #888780; margin-top: 2px; }
+  .input-wrap { display: flex; align-items: center; gap: 4px; }
+  input[type="number"] {
+    width: 80px;
+    padding: 8px 10px;
+    font-size: 16px;
+    border: 1px solid #d3d1c7;
+    border-radius: 8px;
+    text-align: right;
+    font-family: inherit;
+    background: #fafaf6;
+    -webkit-appearance: none;
+    -moz-appearance: textfield;
+  }
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none; margin: 0;
+  }
+  .unit { font-size: 13px; color: #888780; font-weight: 500; }
+  .voltage-card { background: #e6f1fb; border: 1px solid #b5d4f4; }
+  .voltage-card .name { color: #0c447c; }
+  .voltage-card .hint { color: #185fa5; }
+  .calc-btn {
+    width: 100%;
+    padding: 14px;
+    background: #185fa5;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    margin: 16px 0;
+  }
+  .calc-btn:active { background: #0c447c; }
+  .result {
+    background: #2c2c2a;
+    color: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 16px;
+    text-align: center;
+  }
+  .result-label {
+    font-size: 13px;
+    color: #b4b2a9;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+  .result-main { font-size: 36px; font-weight: 700; margin-bottom: 4px; }
+  .result-sub { font-size: 14px; color: #d3d1c7; margin-bottom: 16px; }
+  .breakdown {
+    background: rgba(255,255,255,0.08);
+    border-radius: 8px;
+    padding: 12px;
+    text-align: left;
+    font-size: 13px;
+  }
+  .br-row { display: flex; justify-content: space-between; padding: 4px 0; color: #d3d1c7; }
+  .br-row.total {
+    border-top: 1px solid rgba(255,255,255,0.15);
+    margin-top: 6px;
+    padding-top: 8px;
+    color: #ffffff;
+    font-weight: 600;
+  }
+  .v-status {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    text-align: center;
+  }
+  .v-ok { background: #eaf3de; color: #3b6d11; }
+  .v-low { background: #faeeda; color: #854f0b; }
+  .v-high { background: #fcebeb; color: #791f1f; }
+  
+  .shop-section {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 12px;
+    border: 1px solid #e5e3db;
+  }
+  .shop-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: #2c2c2a;
+  }
+  .shop-sub {
+    font-size: 13px;
+    color: #888780;
+    margin-bottom: 14px;
+  }
+  .shop-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px;
+    background: #f5f4ee;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    text-decoration: none;
+    color: #2c2c2a;
+    font-size: 15px;
+    font-weight: 600;
+    border: 1px solid #e5e3db;
+  }
+  .shop-link:active { background: #e5e3db; }
+  .shop-link-name { display: flex; align-items: center; gap: 10px; }
+  .shop-link-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    color: white;
+  }
+  .icon-hepsi { background: #ff6000; }
+  .icon-amazon { background: #232f3e; }
+  .arrow { color: #888780; font-size: 18px; }
+  
+  .info-box {
+    background: #faeeda;
+    border-left: 3px solid #ba7517;
+    border-radius: 6px;
+    padding: 12px;
+    font-size: 13px;
+    color: #633806;
+    margin-top: 16px;
+  }
+  .info-box strong { color: #412402; }
+  .price-hint {
+    background: #eaf3de;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 12px;
+    font-size: 13px;
+    color: #173404;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>Regülatör Hesaplayıcı</h1>
+<p class="subtitle">Yazlık için doğru kapasite seçimi</p>
+
+<div class="card voltage-card">
+  <div class="row">
+    <div class="icon">⚡</div>
+    <div class="info">
+      <div class="name">Şebeke voltajı</div>
+      <div class="hint">Prizden ölçtüğün en düşük değer</div>
+    </div>
+    <div class="input-wrap">
+      <input type="number" id="voltage" value="220">
+      <span class="unit">V</span>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="row">
+    <div class="icon">🍽️</div>
+    <div class="info">
+      <div class="name">Bulaşık makinesi</div>
+      <div class="hint">Etiketteki Watt değeri</div>
+    </div>
+    <div class="input-wrap">
+      <input type="number" id="w1" value="2200">
+      <span class="unit">W</span>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="row">
+    <div class="icon">🧺</div>
+    <div class="info">
+      <div class="name">Çamaşır makinesi</div>
+      <div class="hint">Etiketteki Watt değeri</div>
+    </div>
+    <div class="input-wrap">
+      <input type="number" id="w2" value="2300">
+      <span class="unit">W</span>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="row">
+    <div class="icon">❄️</div>
+    <div class="info">
+      <div class="name">Buzdolabı</div>
+      <div class="hint">Etiketteki Watt değeri</div>
+    </div>
+    <div class="input-wrap">
+      <input type="number" id="w3" value="200">
+      <span class="unit">W</span>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="row">
+    <div class="icon">🔌</div>
+    <div class="info">
+      <div class="name">Diğer (klima vb.)</div>
+      <div class="hint">İsteğe bağlı</div>
+    </div>
+    <div class="input-wrap">
+      <input type="number" id="w4" value="0">
+      <span class="unit">W</span>
+    </div>
+  </div>
+</div>
+
+<button class="calc-btn" onclick="hesapla()">HESAPLA</button>
+
+<div id="v-status" class="v-status v-ok">Voltaj normal</div>
+
+<div class="result">
+  <div class="result-label">Önerilen regülatör</div>
+  <div class="result-main" id="rmain">5 kVA</div>
+  <div class="result-sub" id="rsub">Hesaplamak için butona bas</div>
+  <div class="breakdown" id="breakdown"></div>
+</div>
+
+<div class="shop-section">
+  <div class="shop-title">🛒 Satın al</div>
+  <div class="shop-sub">Hesaplanan kapasitede servo regülatör ara:</div>
+  <div id="price-hint" class="price-hint">Tahmini fiyat aralığı: 3.000 - 8.000 TL</div>
+  
+  <a id="link-hepsi" class="shop-link" href="#" target="_blank" rel="noopener">
+    <div class="shop-link-name">
+      <div class="shop-link-icon icon-hepsi">h</div>
+      <span>Hepsiburada'da ara</span>
+    </div>
+    <span class="arrow">→</span>
+  </a>
+  
+  <a id="link-amazon" class="shop-link" href="#" target="_blank" rel="noopener">
+    <div class="shop-link-name">
+      <div class="shop-link-icon icon-amazon">a</div>
+      <span>Amazon'da ara</span>
+    </div>
+    <span class="arrow">→</span>
+  </a>
+</div>
+
+<div class="info-box">
+  <strong>💡 Watt değeri nasıl bulunur:</strong> Cihazın arka veya yan etiketine bak. "W" yazan değeri al. Etikette sadece amper (A) varsa: A × 220 = W (örnek: 10A × 220 = 2200W).
+  <br><br>
+  <strong>⚡ Voltaj ölçümü:</strong> Priz voltmetresi (50-100 TL) veya multimetre ile ölç. En düşük değeri yaz.
+  <br><br>
+  <strong>📋 Tavsiye:</strong> Servo motorlu regülatör tercih et (relay tipinden daha hassas). Türkiye'de bilinen markalar: Aktif, Servomatik, Artsan, Liyatech, Endüstriyel.
+</div>
+
+</div>
+
+<script>
+function hesapla() {
+  var v = parseFloat(document.getElementById('voltage').value) || 220;
+  var w1 = parseFloat(document.getElementById('w1').value) || 0;
+  var w2 = parseFloat(document.getElementById('w2').value) || 0;
+  var w3 = parseFloat(document.getElementById('w3').value) || 0;
+  var w4 = parseFloat(document.getElementById('w4').value) || 0;
+  
+  var total = w1 + w2 + w3 + w4;
+  var totalVA = total / 0.8;
+  var requiredVA = totalVA * 1.3;
+  var requiredKVA = requiredVA / 1000;
+  
+  var sizes = [1, 2, 3, 5, 8, 10, 15, 20, 30];
+  var rec = 30;
+  for (var i = 0; i < sizes.length; i++) {
+    if (sizes[i] >= requiredKVA) { rec = sizes[i]; break; }
+  }
+  
+  document.getElementById('rmain').textContent = rec + ' kVA';
+  document.getElementById('rsub').textContent = 'Toplam: ' + total + ' W';
+  
+  var br = '';
+  if (w1 > 0) br += '<div class="br-row"><span>Bulaşık makinesi</span><span>' + w1 + ' W</span></div>';
+  if (w2 > 0) br += '<div class="br-row"><span>Çamaşır makinesi</span><span>' + w2 + ' W</span></div>';
+  if (w3 > 0) br += '<div class="br-row"><span>Buzdolabı</span><span>' + w3 + ' W</span></div>';
+  if (w4 > 0) br += '<div class="br-row"><span>Diğer</span><span>' + w4 + ' W</span></div>';
+  br += '<div class="br-row total"><span>Toplam güç</span><span>' + total + ' W</span></div>';
+  br += '<div class="br-row"><span>VA karşılığı</span><span>' + Math.round(totalVA) + ' VA</span></div>';
+  br += '<div class="br-row"><span>+ %30 marj</span><span>' + Math.round(requiredVA) + ' VA</span></div>';
+  br += '<div class="br-row total"><span>Öneri</span><span>' + rec + ' kVA</span></div>';
+  document.getElementById('breakdown').innerHTML = br;
+  
+  // Tahmini fiyat
+  var fiyat = '';
+  if (rec <= 2) fiyat = '2.000 - 4.000 TL';
+  else if (rec <= 3) fiyat = '2.500 - 5.000 TL';
+  else if (rec <= 5) fiyat = '3.500 - 8.000 TL';
+  else if (rec <= 8) fiyat = '6.000 - 14.000 TL';
+  else if (rec <= 10) fiyat = '8.000 - 18.000 TL';
+  else if (rec <= 15) fiyat = '14.000 - 25.000 TL';
+  else fiyat = '20.000 TL+';
+  document.getElementById('price-hint').textContent = 'Tahmini fiyat aralığı: ' + fiyat;
+  
+  // Alışveriş linkleri
+  var arama = rec + ' kVA servo voltaj regülatörü';
+  var hepsiUrl = 'https://www.hepsiburada.com/ara?q=' + encodeURIComponent(arama);
+  var amazonUrl = 'https://www.amazon.com.tr/s?k=' + encodeURIComponent(arama);
+  
+  document.getElementById('link-hepsi').href = hepsiUrl;
+  document.getElementById('link-amazon').href = amazonUrl;
+  
+  // Voltaj durumu
+  var vs = document.getElementById('v-status');
+  if (v < 195) {
+    vs.className = 'v-status v-low';
+    vs.innerHTML = '⚠️ Düşük voltaj — regülatör şart';
+  } else if (v > 240) {
+    vs.className = 'v-status v-high';
+    vs.innerHTML = '⚠️ Yüksek voltaj — koruma gerekli';
+  } else if (v < 210) {
+    vs.className = 'v-status v-low';
+    vs.innerHTML = '⚠️ Voltaj sınırda';
+  } else {
+    vs.className = 'v-status v-ok';
+    vs.innerHTML = '✓ Voltaj normal';
+  }
+}
+
+window.onload = hesapla;
+hesapla();
+</script>
+
+</body>
+</html>
